@@ -1,6 +1,6 @@
 <?php
 // Charger les paramètres globaux
-$settings = require './settings.php';
+$settings = require ROOT_PATH . '/settings.php';
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <aside class="fixed top-16 left-0 bottom-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto z-40 transition-all duration-300 transform -translate-x-full lg:translate-x-0" id="sidebar">

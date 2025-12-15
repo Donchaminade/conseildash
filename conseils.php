@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+$settings = require ROOT_PATH . '/settings.php'; // Inclure les paramètres
 
 // Récupérer tous les conseils
 try {
@@ -11,7 +12,7 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr" class="h-full bg-gray-50">
+<html lang="fr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +22,7 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body class="h-full">
+<body class="h-full <?= $settings['theme'] === 'dark' ? 'dark' : '' ?>">
     <?php include 'includes/navbar.php'; ?>
     
     <div class="flex">
@@ -117,10 +118,9 @@ try {
                                                                                 <i data-feather="check-circle"></i>
                                                                             </a>
                                                                         <?php endif; ?>
-                                                                        <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $conseil['id'] ?>">
-                                                                            <i data-feather="eye"></i>
-                                                                        </a>
-                                                                        <a href="modifier_conseil.php?id=<?= $conseil['id'] ?>" class="text-blue-600 hover:text-blue-900" title="Modifier">
+                                                                                                                                                    <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $conseil['id'] ?>" data-type="conseil">
+                                                                                                                                                        <i data-feather="eye"></i>
+                                                                                                                                                    </a>                                                                        <a href="modifier_conseil.php?id=<?= $conseil['id'] ?>" class="text-blue-600 hover:text-blue-900" title="Modifier">
                                                                             <i data-feather="edit"></i>
                                                                         </a>
                                                                         <a href="supprimer_conseil.php?id=<?= $conseil['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce conseil ?');">

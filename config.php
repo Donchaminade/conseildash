@@ -1,6 +1,9 @@
 <?php
 // config.php
 
+// Définir le chemin absolu vers la racine du projet
+define('ROOT_PATH', __DIR__);
+
 // Paramètres de la base de données locale
 $db_host = 'localhost';
 $db_name = 'conseilbox';

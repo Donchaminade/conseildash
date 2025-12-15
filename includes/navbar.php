@@ -1,6 +1,6 @@
 <?php
 // Charger les paramètres globaux
-$settings = require '../settings.php';
+$settings = require ROOT_PATH . '/settings.php';
 ?>
 <nav class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-sm h-16 flex items-center px-6 border-b dark:border-gray-700">
     <div class="flex items-center justify-between w-full">

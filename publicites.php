@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+$settings = require ROOT_PATH . '/settings.php'; // Inclure les paramètres
 
 // Récupérer toutes les publicités
 try {
@@ -11,7 +12,7 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr" class="h-full bg-gray-50">
+<html lang="fr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +22,7 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body class="h-full">
+<body class="h-full <?= $settings['theme'] === 'dark' ? 'dark' : '' ?>">
     <?php include 'includes/navbar.php'; ?>
     
     <div class="flex">
@@ -117,7 +118,7 @@ try {
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex space-x-2">
-                                                <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $pub['id'] ?>">
+                                                <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $pub['id'] ?>" data-type="publicite">
                                                     <i data-feather="eye"></i>
                                                 </a>
                                                 <a href="modifier_publicite.php?id=<?= $pub['id'] ?>" class="text-blue-600 hover:text-blue-900" title="Modifier">

@@ -9,7 +9,7 @@ ini_set('display_errors', 1);
 require_once '../config.php'; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $settings_file = '../settings.php';
+    $settings_file = ROOT_PATH . '/settings.php';
     $current_settings = require $settings_file; // Charge les paramètres actuels
 
     $new_settings = $current_settings; // Initialise avec les paramètres actuels
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // --- Traitement du logo du site (upload de fichier) ---
     if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = '../images/'; // Dossier pour les logos
+        $upload_dir = ROOT_PATH . '/images/'; // Dossier pour les logos
         
         // Créer le dossier si nécessaire
         if (!is_dir($upload_dir)) {
@@ -45,8 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Supprimer l'ancien logo si différent et s'il existe
-        if ($new_settings['site_logo'] && file_exists('../' . $new_settings['site_logo']) && $new_settings['site_logo'] !== 'images/logo.png') {
-             unlink('../' . $new_settings['site_logo']);
+        if ($new_settings['site_logo'] && file_exists(ROOT_PATH . '/' . $new_settings['site_logo']) && $new_settings['site_logo'] !== 'images/logo.png') {
+             unlink(ROOT_PATH . '/' . $new_settings['site_logo']);
         }
         
         $file_name = uniqid('logo_') . '_' . basename($_FILES['site_logo']['name']);

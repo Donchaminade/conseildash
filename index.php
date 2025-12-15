@@ -1,6 +1,6 @@
 <?php
 require_once 'config.php';
-
+$settings = require ROOT_PATH . '/settings.php'; // Inclure les paramètres
 // Récupérer les statistiques
 try {
     // Total des conseils
@@ -42,7 +42,7 @@ try {
 
 } catch (\PDOException $e) {
     error_log($e->getMessage());
-    $total_conseils = $published_conseils = $pending_conseils = $total_users = $active_pubs = 0;
+    $total_conseils = $published_conseils = $pending_conseils_global = $total_users = $active_pubs_global = 0;
     $total_publicites = $inactive_publicites = 0;
     $pending_conseils_list = [];
     $inactive_publicites_list = [];
@@ -63,7 +63,7 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="h-full">
+<body class="h-full <?= $settings['theme'] === 'dark' ? 'dark' : '' ?>">
     <?php include 'includes/navbar.php'; ?>
 <div class="flex">
     <?php include 'includes/sidebar.php'; ?>

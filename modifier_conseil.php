@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+$settings = require ROOT_PATH . '/settings.php'; // Inclure les paramètres
 
 // Initialiser les variables
 $conseil = null;
@@ -28,7 +29,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr" class="h-full bg-gray-50">
+<html lang="fr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +39,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body class="h-full bg-gray-100">
+<body class="h-full <?= $settings['theme'] === 'dark' ? 'dark' : '' ?>">
     <?php include 'includes/navbar.php'; ?>
     <div class="flex">
         <?php include 'includes/sidebar.php'; ?>
