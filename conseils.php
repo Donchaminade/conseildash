@@ -22,16 +22,25 @@ try {
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body class="h-full">
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm h-16 flex items-center px-6 border-b">
-        <!-- Navbar content -->
-    </nav>
+    <?php include 'includes/navbar.php'; ?>
     
     <div class="flex">
-        <aside class="fixed top-16 left-0 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 transition-all duration-300 transform -translate-x-full lg:translate-x-0" id="sidebar">
-            <!-- Sidebar content -->
-        </aside>
+    <?php include 'includes/sidebar.php'; ?>
         
         <main class="flex-1 p-8 ml-64">
+            <?php if (isset($_GET['error'])): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAlert("Erreur : <?= htmlspecialchars($_GET['error']) ?>", 'error');
+                    });
+                </script>
+            <?php elseif (isset($_GET['success'])): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAlert("Succès : <?= htmlspecialchars($_GET['success']) ?>", 'success');
+                    });
+                </script>
+            <?php endif; ?>
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Gestion des Conseils</h1>
                 <a href="ajouter_conseil.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
@@ -44,35 +53,85 @@ try {
                 
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <!-- Table headers -->
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <?php foreach ($conseils as $conseil): ?>
-                                <tr>
-                                    <!-- ... autres td ... -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex space-x-2">
-                                            <?php if ($conseil['status'] === 'pending'): ?>
-                                                <a href="valider_conseil.php?id=<?= $conseil['id'] ?>" class="text-green-600 hover:text-green-900" title="Valider">
-                                                    <i data-feather="check-circle"></i>
-                                                </a>
-                                            <?php endif; ?>
-                                            <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $conseil['id'] ?>">
-                                                <i data-feather="eye"></i>
-                                            </a>
-                                            <a href="modifier_conseil.php?id=<?= $conseil['id'] ?>" class="text-blue-600 hover:text-blue-900" title="Modifier">
-                                                <i data-feather="edit"></i>
-                                            </a>
-                                            <a href="supprimer_conseil.php?id=<?= $conseil['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce conseil ?');">
-                                                <i data-feather="trash-2"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                                                <thead class="bg-gray-50">
+                                                    <tr>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            <input type="checkbox" class="rounded text-blue-600">
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Titre</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Auteur</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Localisation</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contenu</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Anecdote</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Statut</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Date</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                    <?php if (empty($conseils)): ?>
+                                                        <tr>
+                                                            <td colspan="9" class="px-6 py-4 text-center text-gray-500">Aucun conseil trouvé.</td>
+                                                        </tr>
+                                                    <?php else: ?>
+                                                        <?php foreach ($conseils as $conseil): ?>
+                                                            <tr>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <input type="checkbox" class="rounded text-blue-600">
+                                                                </td>
+                                                                <td class="px-6 py-4 w-auto">
+                                                                    <div class="text-sm font-medium text-gray-900"><?= htmlspecialchars($conseil['title']) ?></div>
+                                                                </td>
+                                                                <td class="px-6 py-4 w-auto">
+                                                                    <div class="text-sm text-gray-900"><?= htmlspecialchars($conseil['author']) ?></div>
+                                                                </td>
+                                                                <td class="px-6 py-4 w-auto">
+                                                                    <div class="text-sm text-gray-500"><?= htmlspecialchars($conseil['location']) ?></div>
+                                                                </td>
+                                                                <td class="px-6 py-4 max-w-xs truncate">
+                                                                    <div class="text-sm text-gray-800" title="<?= htmlspecialchars($conseil['content']) ?>">
+                                                                        <?= htmlspecialchars(strlen($conseil['content']) > 70 ? substr($conseil['content'], 0, 70) . '...' : $conseil['content']) ?>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="px-6 py-4 max-w-xs truncate">
+                                                                    <div class="text-sm text-gray-800" title="<?= htmlspecialchars($conseil['anecdote'] ?? 'N/A') ?>">
+                                                                        <?= htmlspecialchars(strlen($conseil['anecdote'] ?? '') > 70 ? substr($conseil['anecdote'], 0, 70) . '...' : ($conseil['anecdote'] ?? 'N/A')) ?>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="px-6 py-4 whitespace-nowrap w-auto">
+                                                                    <?php
+                                                                        $status_color = $conseil['status'] === 'published' ? 'green' : 'yellow';
+                                                                        $status_text = $conseil['status'] === 'published' ? 'Publié' : 'En attente';
+                                                                    ?>
+                                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-<?= $status_color ?>-100 text-<?= $status_color ?>-800">
+                                                                        <?= $status_text ?>
+                                                                    </span>
+                                                                </td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-auto">
+                                                                    <?= date('d/m/Y', strtotime($conseil['created_at'])) ?>
+                                                                </td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                                    <div class="flex space-x-2">
+                                                                        <?php if ($conseil['status'] === 'pending'): ?>
+                                                                            <a href="valider_conseil.php?id=<?= $conseil['id'] ?>" class="text-green-600 hover:text-green-900" title="Valider">
+                                                                                <i data-feather="check-circle"></i>
+                                                                            </a>
+                                                                        <?php endif; ?>
+                                                                        <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $conseil['id'] ?>">
+                                                                            <i data-feather="eye"></i>
+                                                                        </a>
+                                                                        <a href="modifier_conseil.php?id=<?= $conseil['id'] ?>" class="text-blue-600 hover:text-blue-900" title="Modifier">
+                                                                            <i data-feather="edit"></i>
+                                                                        </a>
+                                                                        <a href="supprimer_conseil.php?id=<?= $conseil['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce conseil ?');">
+                                                                            <i data-feather="trash-2"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </tbody>                    </table>
                 </div>
                 <!-- Pagination -->
             </div>
@@ -117,47 +176,7 @@ try {
         </div>
     </div>
     
+
     <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            feather.replace();
-            
-            const detailPanel = document.getElementById('detailPanel');
-            const closeDetailPanelBtn = document.getElementById('closeDetailPanel');
-            
-            document.querySelectorAll('.view-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const conseilId = this.getAttribute('data-id');
-                    
-                    fetch(`get_conseil_details.php?id=${conseilId}`)
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.success) {
-                                const data = result.data;
-                                document.getElementById('detailTitle').textContent = data.title;
-                                document.getElementById('detailAuthor').textContent = data.author;
-                                document.getElementById('detailLocation').textContent = data.location || '-';
-                                document.getElementById('detailDate').textContent = data.created_at_formatted;
-                                document.getElementById('detailContent').textContent = data.content;
-                                document.getElementById('detailAnecdote').textContent = data.anecdote || 'Aucune anecdote fournie.';
-                                
-                                detailPanel.classList.remove('translate-x-full');
-                            } else {
-                                alert(result.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Erreur:', error);
-                            alert('Impossible de récupérer les détails.');
-                        });
-                });
-            });
-            
-            closeDetailPanelBtn.addEventListener('click', function() {
-                detailPanel.classList.add('translate-x-full');
-            });
-        });
-    </script>
 </body>
 </html>

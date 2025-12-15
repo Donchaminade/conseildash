@@ -11,8 +11,10 @@
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body class="h-full bg-gray-100">
-    <?php // Navbar et sidebar ?>
-
+    <?php include 'includes/navbar.php'; ?>
+    <div class="flex">
+        <?php include 'includes/sidebar.php'; ?>
+        
     <main class="flex-1 p-4 sm:p-8 ml-0 lg:ml-64">
         <div class="max-w-3xl mx-auto">
             <div class="flex items-center mb-6">
@@ -22,6 +24,20 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 ml-4">Nouvelle Publicité</h1>
             </div>
 
+            <?php if (isset($_GET['error'])): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAlert("Erreur : <?= htmlspecialchars($_GET['error']) ?>", 'error');
+                    });
+                </script>
+            <?php elseif (isset($_GET['success'])): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAlert("Succès : <?= htmlspecialchars($_GET['success']) ?>", 'success');
+                    });
+                </script>
+            <?php endif; ?>
+            
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                 <form action="actions/_ajouter_publicite.php" method="POST" enctype="multipart/form-data">
                     <div class="p-6 sm:p-8 space-y-8">
@@ -76,8 +92,6 @@
             </div>
         </div>
     </main>
-    <script>
-        feather.replace();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

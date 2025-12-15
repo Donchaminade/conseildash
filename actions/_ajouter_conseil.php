@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once '../config.php';
 
 // Vérifier si le formulaire a été soumis en méthode POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

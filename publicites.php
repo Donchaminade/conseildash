@@ -13,19 +13,34 @@ try {
 <!DOCTYPE html>
 <html lang="fr" class="h-full bg-gray-50">
 <head>
-    <!-- Head content -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicités - ConseilBox Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body class="h-full">
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm h-16 flex items-center px-6 border-b">
-        <!-- Navbar -->
-    </nav>
+    <?php include 'includes/navbar.php'; ?>
     
     <div class="flex">
-        <aside class="fixed top-16 left-0 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 ...">
-            <!-- Sidebar -->
-        </aside>
+    <?php include 'includes/sidebar.php'; ?>
         
         <main class="flex-1 p-8 ml-64">
+            <?php if (isset($_GET['error'])): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAlert("Erreur : <?= htmlspecialchars($_GET['error']) ?>", 'error');
+                    });
+                </script>
+            <?php elseif (isset($_GET['success'])): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAlert("Succès : <?= htmlspecialchars($_GET['success']) ?>", 'success');
+                    });
+                </script>
+            <?php endif; ?>
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Gestion des Publicités</h1>
                 <a href="ajouter_publicite.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
@@ -37,26 +52,85 @@ try {
                 <!-- Filtres et recherche -->
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <!-- ... thead ... -->
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <input type="checkbox" class="rounded text-blue-600">
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Image</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Titre</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Contenu</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">URL Cible</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Début</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Fin</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Statut</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <?php foreach ($publicites as $pub): ?>
+                            <?php if (empty($publicites)): ?>
                                 <tr>
-                                    <!-- ... autres td ... -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex space-x-2">
-                                            <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $pub['id'] ?>">
-                                                <i data-feather="eye"></i>
-                                            </a>
-                                            <a href="modifier_publicite.php?id=<?= $pub['id'] ?>" class="text-blue-600 hover:text-blue-900" title="Modifier">
-                                                <i data-feather="edit"></i>
-                                            </a>
-                                            <a href="supprimer_publicite.php?id=<?= $pub['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publicité ?');">
-                                                <i data-feather="trash-2"></i>
-                                            </a>
-                                        </div>
-                                    </td>
+                                    <td colspan="9" class="px-6 py-4 text-center text-gray-500">Aucune publicité trouvée.</td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php else: ?>
+                                <?php foreach ($publicites as $pub): ?>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="checkbox" class="rounded text-blue-600">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="h-10 w-10 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                <?php if ($pub['image_url']): ?>
+                                                    <img src="<?= htmlspecialchars($pub['image_url']) ?>" alt="Publicité" class="h-full w-full object-cover">
+                                                <?php else: ?>
+                                                    <i data-feather="image" class="text-gray-400"></i>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 w-auto">
+                                            <div class="text-sm font-medium text-gray-900"><?= htmlspecialchars($pub['title']) ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 max-w-xs truncate">
+                                            <div class="text-sm text-gray-800" title="<?= htmlspecialchars($pub['content']) ?>">
+                                                <?= htmlspecialchars(strlen($pub['content']) > 70 ? substr($pub['content'], 0, 70) . '...' : $pub['content']) ?>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 w-auto">
+                                            <div class="text-sm text-blue-600 hover:underline">
+                                                <a href="<?= htmlspecialchars($pub['target_url']) ?>" target="_blank"><?= htmlspecialchars($pub['target_url']) ?></a>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-auto">
+                                            <?= $pub['start_date'] ? date('d/m/Y', strtotime($pub['start_date'])) : '-' ?>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-auto">
+                                            <?= $pub['end_date'] ? date('d/m/Y', strtotime($pub['end_date'])) : '-' ?>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap w-auto">
+                                            <?php
+                                                $status_color = $pub['is_active'] ? 'green' : 'red';
+                                                $status_text = $pub['is_active'] ? 'Actif' : 'Inactif';
+                                            ?>
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-<?= $status_color ?>-100 text-<?= $status_color ?>-800">
+                                                <?= $status_text ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $pub['id'] ?>">
+                                                    <i data-feather="eye"></i>
+                                                </a>
+                                                <a href="modifier_publicite.php?id=<?= $pub['id'] ?>" class="text-blue-600 hover:text-blue-900" title="Modifier">
+                                                    <i data-feather="edit"></i>
+                                                </a>
+                                                <a href="supprimer_publicite.php?id=<?= $pub['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publicité ?');">
+                                                    <i data-feather="trash-2"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -105,47 +179,8 @@ try {
         </div>
     </div>
     
+
+
     <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            feather.replace();
-            
-            const detailPanel = document.getElementById('detailPanel');
-            const closeDetailPanelBtn = document.getElementById('closeDetailPanel');
-            
-            document.querySelectorAll('.view-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pubId = this.getAttribute('data-id');
-                    
-                    fetch(`get_publicite_details.php?id=${pubId}`)
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.success) {
-                                const data = result.data;
-                                document.getElementById('detailImage').src = data.image_url || 'https://via.placeholder.com/300x150?text=Pas+d\'image';
-                                document.getElementById('detailTitle').textContent = data.title;
-                                document.getElementById('detailStatus').textContent = data.status_text;
-                                const targetUrlLink = document.getElementById('detailTargetUrl');
-                                targetUrlLink.href = data.target_url;
-                                targetUrlLink.textContent = data.target_url;
-                                document.getElementById('detailStartDate').textContent = data.start_date_formatted;
-                                document.getElementById('detailEndDate').textContent = data.end_date_formatted;
-                                document.getElementById('detailContent').textContent = data.content;
-                                
-                                detailPanel.classList.remove('translate-x-full');
-                            } else {
-                                alert(result.message);
-                            }
-                        })
-                        .catch(error => console.error('Erreur:', error));
-                });
-            });
-            
-            closeDetailPanelBtn.addEventListener('click', () => {
-                detailPanel.classList.add('translate-x-full');
-            });
-        });
-    </script>
 </body>
 </html>
