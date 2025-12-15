@@ -146,8 +146,8 @@ try {
             
             <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
                 <div class="flex justify-between items-center p-6 border-b">
-                    <h2 class="text-lg font-semibold">Derniers Conseils</h2>
-                    <a href="conseils.php" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Voir tout</a>
+                    <h2 class="text-lg font-semibold">Suggestions de Conseils</h2>
+                    <a href="conseils.php?status=pending" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Voir tout</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -155,51 +155,43 @@ try {
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auteur</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localisation</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">Optimiser la visibilité de vos projets en ligne</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-500">adc</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-500">lome</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Publié</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">04/12/2025</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Modifier</a>
-                                    <a href="#" class="text-red-600 hover:text-red-900">Supprimer</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">je vinseil</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-500">chaussures</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-500">Niger</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Publié</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">04/12/2025</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Modifier</a>
-                                    <a href="#" class="text-red-600 hover:text-red-900">Supprimer</a>
-                                </td>
-                            </tr>
+                            <?php if (empty($pending_conseils_list)): ?>
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">Aucune suggestion de conseil.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($pending_conseils_list as $conseil): ?>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900"><?= htmlspecialchars($conseil['title']) ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-500"><?= htmlspecialchars($conseil['author']) ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <?= date('d/m/Y', strtotime($conseil['created_at'])) ?>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $conseil['id'] ?>" data-type="conseil">
+                                                    <i data-feather="eye"></i>
+                                                </a>
+                                                <a href="valider_conseil.php?id=<?= $conseil['id'] ?>" class="text-green-600 hover:text-green-900" title="Valider">
+                                                    <i data-feather="check-circle"></i>
+                                                </a>
+                                                <a href="supprimer_conseil.php?id=<?= $conseil['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce conseil ?');">
+                                                    <i data-feather="trash-2"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -357,7 +349,7 @@ try {
             data: {
                 labels: ['Publiés', 'En attente'],
                 datasets: [{
-                    data: [<?= $published_conseils ?>, <?= $pending_conseils ?>],
+                    data: [<?= $published_conseils ?>, <?= $pending_conseils_global ?>],
                     backgroundColor: [
                         'rgba(16, 185, 129, 0.8)',
                         'rgba(245, 158, 11, 0.8)'

@@ -34,8 +34,12 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     <title>Modifier une Publicité - ConseilBox Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body class="h-full bg-gray-100">
+     <?php include 'includes/navbar.php'; ?>
+    <div class="flex">
+        <?php include 'includes/sidebar.php'; ?>
     <main class="flex-1 p-4 sm:p-8 ml-0 lg:ml-64">
         <div class="max-w-3xl mx-auto">
              <div class="flex items-center mb-6">
