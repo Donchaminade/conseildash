@@ -1,4 +1,6 @@
 <?php
+require_once 'auth_check.php'; // Vérifie l'authentification avant tout
+
 require_once 'config.php';
 $settings = require ROOT_PATH . '/settings.php'; // Charge les paramètres actuels
 
@@ -28,7 +30,6 @@ try {
     $email_message = "Erreur : Impossible de charger les informations de l'administrateur.";
     $email_message_type = 'error';
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="fr" class="h-full">

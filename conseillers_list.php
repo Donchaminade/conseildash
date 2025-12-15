@@ -1,5 +1,8 @@
 <?php
+require_once 'auth_check.php'; // Vérifie l'authentification avant tout
+
 require_once 'config.php';
+$settings = require ROOT_PATH . '/settings.php'; // Inclure les paramètres
 
 // Récupérer la liste complète des conseillers uniques avec leur localisation
 try {

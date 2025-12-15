@@ -1,6 +1,8 @@
 <?php
+require_once 'auth_check.php'; // Vérifie l'authentification avant tout
+
 require_once 'config.php';
-$settings = require_once './settings.php'; // Charge les paramètres actuels
+$settings = require ROOT_PATH . '/settings.php'; // Charge les paramètres actuels
 
 // Gérer l'affichage des messages de succès/erreur
 $message = '';

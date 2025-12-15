@@ -24,10 +24,9 @@ $settings = require ROOT_PATH . '/settings.php';
                 <i data-feather="search" class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400"></i>
             </div>
             
-            <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative">
-                <i data-feather="bell" class="text-gray-500 dark:text-gray-400"></i>
-                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-            </button>
+            <a href="logout.php" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative" title="Déconnexion">
+                <i data-feather="log-out" class="text-gray-500 dark:text-gray-400"></i>
+            </a>
             
             <div class="relative ml-4">
                 <div class="flex items-center space-x-2 cursor-pointer" id="profileBtn">
