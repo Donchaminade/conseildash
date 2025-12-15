@@ -207,7 +207,6 @@ try {
                 </div>
             </div>
 
-            <!-- Nouveau : Conseils à valider -->
             <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
                 <div class="flex justify-between items-center p-6 border-b">
                     <h2 class="text-lg font-semibold">Conseils à Valider</h2>

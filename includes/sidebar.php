@@ -44,7 +44,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <i data-feather="chevron-down" class="text-gray-500 w-4 h-4 transform group-hover:rotate-180 transition-transform"></i>
                         </div>
                         <div class="pl-4 mt-1 space-y-1 hidden" id="usersMenu">
-                            <a href="conseillers_list.php" class="block px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Liste des Conseillers</a>
+                            <a href="conseillers_list.php" class="block px-3 py-1.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-100 <?= ($current_page == 'conseillers_list.php') ? 'bg-blue-50 text-blue-600' : '' ?>">Liste des Conseillers</a>
                             <a href="#" class="block px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Rôles</a>
                             <a href="#" class="block px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Permissions</a>
                         </div>
