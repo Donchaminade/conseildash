@@ -31,13 +31,23 @@ try {
     $inactive_publicites_stmt = $pdo->query('SELECT COUNT(*) FROM publicites WHERE is_active = 0');
     $inactive_publicites = $inactive_publicites_stmt->fetchColumn();
 
+    // --- Statistiques et listes pour les conseillers ---
+    // Total des conseillers uniques
+    $total_conseillers_stmt = $pdo->query('SELECT COUNT(DISTINCT author) FROM conseils');
+    $total_conseillers = $total_conseillers_stmt->fetchColumn();
+
+    // Liste des conseillers uniques avec leur localisation
+    $conseillers_list_stmt = $pdo->query('SELECT DISTINCT author, location FROM conseils ORDER BY author ASC LIMIT 5');
+    $conseillers_list = $conseillers_list_stmt->fetchAll();
+
 } catch (\PDOException $e) {
-    // En cas d'erreur, on peut afficher un message ou initialiser les variables à 0
-    // Pour la production, il serait préférable de logger l'erreur.
     error_log($e->getMessage());
     $total_conseils = $published_conseils = $pending_conseils = $total_users = $active_pubs = 0;
-    $total_publicites = 0;
-    $inactive_publicites = 0;
+    $total_publicites = $inactive_publicites = 0;
+    $pending_conseils_list = [];
+    $inactive_publicites_list = [];
+    $total_conseillers = 0;
+    $conseillers_list = [];
 }
 ?>
 <!DOCTYPE html>
@@ -94,8 +104,8 @@ try {
                         <i data-feather="users"></i>
                     </div>
                     <div>
-                        <h3 class="text-gray-500 text-sm font-medium">Utilisateurs</h3>
-                        <p class="text-2xl font-semibold"><?= $total_users ?></p>
+                        <h3 class="text-gray-500 text-sm font-medium">Conseillers</h3>
+                        <p class="text-2xl font-semibold"><?= $total_conseillers ?></p>
                     </div>
                 </div>
 
@@ -300,6 +310,58 @@ try {
                                                 </a>
                                                 <a href="supprimer_publicite.php?id=<?= $pub['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publicité ?');">
                                                     <i data-feather="trash-2"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Nouveau : Liste des Conseillers -->
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <h2 class="text-lg font-semibold">Liste des Conseillers</h2>
+                    <div class="flex space-x-2">
+                        <a href="export_conseillers_excel.php" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center text-sm">
+                            <i data-feather="file-text" class="mr-2 w-4 h-4"></i> Exporter Excel
+                        </a>
+                        <a href="export_conseillers_pdf.php" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center text-sm">
+                            <i data-feather="file" class="mr-2 w-4 h-4"></i> Exporter PDF
+                        </a>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conseiller</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localisation</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php if (empty($conseillers_list)): ?>
+                                <tr>
+                                    <td colspan="3" class="px-6 py-4 text-center text-gray-500">Aucun conseiller trouvé.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($conseillers_list as $conseiller): ?>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900"><?= htmlspecialchars($conseiller['author']) ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-500"><?= htmlspecialchars($conseiller['location'] ?? 'Non spécifié') ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <!-- Action "Voir les conseils de ce conseiller" ou autre -->
+                                                <a href="conseils.php?author=<?= urlencode($conseiller['author']) ?>" class="text-blue-600 hover:text-blue-900" title="Voir les conseils">
+                                                    <i data-feather="eye"></i>
                                                 </a>
                                             </div>
                                         </td>
