@@ -2,7 +2,7 @@
 
 This document provides an overview of the available API endpoints for managing `conseils` (advice) and `publicites` (advertisements).
 
-**Base URL:** `http://your-domain.com/api/` (replace `your-domain.com` with your actual domain or IP address)
+**Base URL:** `https://grosbit.com/conseilbox/api/` (replace `your-domain.com` with your actual domain or IP address)
 
 ---
 
