@@ -1,0 +1,8 @@
+[2025-12-15 19:18:58] ERROR: Method not allowed.
+Context: {
+    "request_method": "GET",
+    "request_uri": "\/conseildash\/api\/publicites\/update.php",
+    "status_code": 405,
+    "php_input": ""
+}
+--------------------------------------------------
