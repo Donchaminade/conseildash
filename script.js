@@ -25,29 +25,65 @@ function exportToPDF(elementId, filename = 'document') {
     // ... (unchanged) ...
 }
 
-// Initialize Detail Panel for Conseils
-function initDetailPanelConseils() {
+// Initialize Dynamic Detail Panel
+function initDetailPanels() {
     const detailPanel = document.getElementById('detailPanel');
     const closeDetailPanelBtn = document.getElementById('closeDetailPanel');
     
     document.querySelectorAll('.view-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            const conseilId = this.getAttribute('data-id');
+            const itemId = this.getAttribute('data-id');
+            const itemType = this.getAttribute('data-type'); // 'conseil' or 'publicite'
             
-            fetch(`get_conseil_details.php?id=${conseilId}`)
+            let apiUrl = '';
+            let panelTitle = '';
+            let contentRenderer = (data) => {}; // Function to populate panel specific to item type
+
+            if (itemType === 'conseil') {
+                apiUrl = `get_conseil_details.php?id=${itemId}`;
+                panelTitle = 'Détails du Conseil';
+                contentRenderer = (data) => {
+                    document.getElementById('detailTitle').textContent = data.title;
+                    document.getElementById('detailAuthor').textContent = data.author;
+                    document.getElementById('detailLocation').textContent = data.location || '-';
+                    document.getElementById('detailDate').textContent = data.created_at_formatted;
+                    document.getElementById('detailContent').textContent = data.content;
+                    document.getElementById('detailAnecdote').textContent = data.anecdote || 'Aucune anecdote fournie.';
+                };
+            } else if (itemType === 'publicite') {
+                apiUrl = `get_publicite_details.php?id=${itemId}`;
+                panelTitle = 'Détails de la Publicité';
+                contentRenderer = (data) => {
+                    document.getElementById('detailImage').src = data.image_url || 'https://via.placeholder.com/300x150?text=Pas+d\'image';
+                    document.getElementById('detailTitle').textContent = data.title;
+                    document.getElementById('detailStatus').textContent = data.status_text;
+                    const targetUrlLink = document.getElementById('detailTargetUrl');
+                    targetUrlLink.href = data.target_url;
+                    targetUrlLink.textContent = data.target_url;
+                    document.getElementById('detailStartDate').textContent = data.start_date_formatted;
+                    document.getElementById('detailEndDate').textContent = data.end_date_formatted;
+                    document.getElementById('detailContent').textContent = data.content;
+                };
+            } else {
+                console.error('Type d\'élément inconnu:', itemType);
+                alert('Type d\'élément inconnu.');
+                return;
+            }
+
+            // Update panel title (assuming it exists and we need to update it)
+            if (detailPanel.querySelector('h2')) {
+                detailPanel.querySelector('h2').textContent = panelTitle;
+            }
+            // Temporarily hide parts of the panel that might not apply to both types if needed
+            // Or ensure the panel is designed generically enough
+
+            fetch(apiUrl)
                 .then(response => response.json())
                 .then(result => {
                     if (result.success) {
-                        const data = result.data;
-                        document.getElementById('detailTitle').textContent = data.title;
-                        document.getElementById('detailAuthor').textContent = data.author;
-                        document.getElementById('detailLocation').textContent = data.location || '-';
-                        document.getElementById('detailDate').textContent = data.created_at_formatted;
-                        document.getElementById('detailContent').textContent = data.content;
-                        document.getElementById('detailAnecdote').textContent = data.anecdote || 'Aucune anecdote fournie.';
-                        
-                        detailPanel.classList.remove('translate-x-full');
+                        contentRenderer(result.data); // Populate specific content
+                        detailPanel.classList.remove('translate-x-full'); // Show panel
                     } else {
                         alert(result.message);
                     }
@@ -56,45 +92,6 @@ function initDetailPanelConseils() {
                     console.error('Erreur:', error);
                     alert('Impossible de récupérer les détails.');
                 });
-        });
-    });
-    
-    closeDetailPanelBtn.addEventListener('click', function() {
-        detailPanel.classList.add('translate-x-full');
-    });
-}
-
-// Initialize Detail Panel for Publicités
-function initDetailPanelPublicites() {
-    const detailPanel = document.getElementById('detailPanel');
-    const closeDetailPanelBtn = document.getElementById('closeDetailPanel');
-    
-    document.querySelectorAll('.view-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const pubId = this.getAttribute('data-id');
-            
-            fetch(`get_publicite_details.php?id=${pubId}`)
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        const data = result.data;
-                        document.getElementById('detailImage').src = data.image_url || 'https://via.placeholder.com/300x150?text=Pas+d\'image';
-                        document.getElementById('detailTitle').textContent = data.title;
-                        document.getElementById('detailStatus').textContent = data.status_text;
-                        const targetUrlLink = document.getElementById('detailTargetUrl');
-                        targetUrlLink.href = data.target_url;
-                        targetUrlLink.textContent = data.target_url;
-                        document.getElementById('detailStartDate').textContent = data.start_date_formatted;
-                        document.getElementById('detailEndDate').textContent = data.end_date_formatted;
-                        document.getElementById('detailContent').textContent = data.content;
-                        
-                        detailPanel.classList.remove('translate-x-full');
-                    } else {
-                        alert(result.message);
-                    }
-                })
-                .catch(error => console.error('Erreur:', error));
         });
     });
     
@@ -139,13 +136,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize detail panels conditionally
-    if (document.getElementById('detailPanel') && document.querySelector('[data-id][title="Voir"]')) {
-        // Check if it's the conseils or publicites page based on the elements present
-        if (window.location.pathname.includes('conseils.php')) {
-            initDetailPanelConseils();
-        } else if (window.location.pathname.includes('publicites.php')) {
-            initDetailPanelPublicites();
-        }
+    if (document.getElementById('detailPanel') && document.querySelector('.view-btn')) {
+        initDetailPanels(); // Call the unified function
     }
 });
 

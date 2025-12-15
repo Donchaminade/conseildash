@@ -12,22 +12,32 @@ try {
     $published_conseils = $published_conseils_stmt->fetchColumn();
 
     // Conseils en attente
-    $pending_conseils_stmt = $pdo->query("SELECT COUNT(*) FROM conseils WHERE status = 'pending'");
-    $pending_conseils = $pending_conseils_stmt->fetchColumn();
+    $pending_conseils_global_stmt = $pdo->query("SELECT COUNT(*) FROM conseils WHERE status = 'pending'");
+    $pending_conseils_global = $pending_conseils_global_stmt->fetchColumn();
 
-    // // Total des utilisateurs
-    // $total_users_stmt = $pdo->query('SELECT COUNT(*) FROM users');
-    // $total_users = $total_users_stmt->fetchColumn();
+    // Total des utilisateurs
+    $total_users_stmt = $pdo->query('SELECT COUNT(*) FROM users');
+    $total_users = $total_users_stmt->fetchColumn();
 
     // Publicités actives
-    $active_pubs_stmt = $pdo->query('SELECT COUNT(*) FROM publicites WHERE is_active = 1');
-    $active_pubs = $active_pubs_stmt->fetchColumn();
+    $active_pubs_global_stmt = $pdo->query('SELECT COUNT(*) FROM publicites WHERE is_active = 1');
+    $active_pubs_global = $active_pubs_global_stmt->fetchColumn();
+
+    // Total des publicités
+    $total_publicites_stmt = $pdo->query('SELECT COUNT(*) FROM publicites');
+    $total_publicites = $total_publicites_stmt->fetchColumn();
+
+    // Publicités inactives
+    $inactive_publicites_stmt = $pdo->query('SELECT COUNT(*) FROM publicites WHERE is_active = 0');
+    $inactive_publicites = $inactive_publicites_stmt->fetchColumn();
 
 } catch (\PDOException $e) {
     // En cas d'erreur, on peut afficher un message ou initialiser les variables à 0
     // Pour la production, il serait préférable de logger l'erreur.
     error_log($e->getMessage());
     $total_conseils = $published_conseils = $pending_conseils = $total_users = $active_pubs = 0;
+    $total_publicites = 0;
+    $inactive_publicites = 0;
 }
 ?>
 <!DOCTYPE html>
@@ -75,7 +85,7 @@ try {
                     </div>
                     <div>
                         <h3 class="text-gray-500 text-sm font-medium">En Attente</h3>
-                        <p class="text-2xl font-semibold"><?= $pending_conseils ?></p>
+                        <p class="text-2xl font-semibold"><?= $pending_conseils_global ?></p>
                     </div>
                 </div>
                 
@@ -86,6 +96,28 @@ try {
                     <div>
                         <h3 class="text-gray-500 text-sm font-medium">Utilisateurs</h3>
                         <p class="text-2xl font-semibold"><?= $total_users ?></p>
+                    </div>
+                </div>
+
+                <!-- Nouvelle carte pour Total Publicités -->
+                <div class="bg-white rounded-lg shadow p-6 flex items-center">
+                    <div class="p-3 rounded-full bg-orange-100 text-orange-600 mr-4">
+                        <i data-feather="image"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-medium">Total Publicités</h3>
+                        <p class="text-2xl font-semibold"><?= $total_publicites ?></p>
+                    </div>
+                </div>
+
+                <!-- Nouvelle carte pour Publicités Inactives -->
+                <div class="bg-white rounded-lg shadow p-6 flex items-center">
+                    <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                        <i data-feather="x-circle"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-medium">Publicités Inactives</h3>
+                        <p class="text-2xl font-semibold"><?= $inactive_publicites ?></p>
                     </div>
                 </div>
             </div>
@@ -168,6 +200,120 @@ try {
                                     <a href="#" class="text-red-600 hover:text-red-900">Supprimer</a>
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Nouveau : Conseils à valider -->
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <h2 class="text-lg font-semibold">Conseils à Valider</h2>
+                    <a href="conseils.php?status=pending" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Voir tout</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auteur</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php if (empty($pending_conseils_list)): ?>
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">Aucun conseil en attente.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($pending_conseils_list as $conseil): ?>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900"><?= htmlspecialchars($conseil['title']) ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-500"><?= htmlspecialchars($conseil['author']) ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <?= date('d/m/Y', strtotime($conseil['created_at'])) ?>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $conseil['id'] ?>" data-type="conseil">
+                                                    <i data-feather="eye"></i>
+                                                </a>
+                                                <a href="valider_conseil.php?id=<?= $conseil['id'] ?>" class="text-green-600 hover:text-green-900" title="Valider">
+                                                    <i data-feather="check-circle"></i>
+                                                </a>
+                                                <a href="supprimer_conseil.php?id=<?= $conseil['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce conseil ?');">
+                                                    <i data-feather="trash-2"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Nouveau : Publicités Inactives -->
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <h2 class="text-lg font-semibold">Publicités Inactives</h2>
+                    <a href="publicites.php?status=inactive" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Voir tout</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php if (empty($inactive_publicites_list)): ?>
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">Aucune publicité inactive.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($inactive_publicites_list as $pub): ?>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="h-10 w-10 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                <?php if ($pub['image_url']): ?>
+                                                    <img src="<?= htmlspecialchars($pub['image_url']) ?>" alt="Publicité" class="h-full w-full object-cover">
+                                                <?php else: ?>
+                                                    <i data-feather="image" class="text-gray-400"></i>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900"><?= htmlspecialchars($pub['title']) ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <?= date('d/m/Y', strtotime($pub['created_at'])) ?>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <a href="#" class="text-blue-600 hover:text-blue-900 view-btn" title="Voir" data-id="<?= $pub['id'] ?>" data-type="publicite">
+                                                    <i data-feather="eye"></i>
+                                                </a>
+                                                <a href="valider_publicite.php?id=<?= $pub['id'] ?>" class="text-green-600 hover:text-green-900" title="Activer">
+                                                    <i data-feather="check-circle"></i>
+                                                </a>
+                                                <a href="supprimer_publicite.php?id=<?= $pub['id'] ?>" class="text-red-600 hover:text-red-900" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publicité ?');">
+                                                    <i data-feather="trash-2"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

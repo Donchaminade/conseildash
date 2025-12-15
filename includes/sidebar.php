@@ -15,8 +15,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <i data-feather="file-text" class="mr-3 <?= ($current_page == 'conseils.php') ? 'text-blue-500' : 'text-gray-500' ?>"></i>
                         Conseils
                     </div>
-                    <?php if (isset($pending_conseils)): // Seulement si la variable est définie (sur index.php) ?>
-                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full"><?= $pending_conseils ?></span>
+                    <?php if (isset($pending_conseils_global)): // Seulement si la variable est définie (sur index.php) ?>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full"><?= $pending_conseils_global ?></span>
                     <?php endif; ?>
                 </a>
                 
@@ -25,8 +25,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <i data-feather="alert-circle" class="mr-3 <?= ($current_page == 'publicites.php') ? 'text-blue-500' : 'text-gray-500' ?>"></i>
                         Publicités
                     </div>
-                    <?php if (isset($active_pubs)): // Seulement si la variable est définie (sur index.php) ?>
-                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full"><?= $active_pubs ?></span>
+                    <?php if (isset($active_pubs_global)): // Seulement si la variable est définie (sur index.php) ?>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full"><?= $active_pubs_global ?></span>
                     <?php endif; ?>
                 </a>
             </div>
