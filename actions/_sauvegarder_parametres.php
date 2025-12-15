@@ -24,6 +24,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $new_settings['theme'] = $_POST['theme'];
     }
 
+    // --- Traitement du code OTP ---
+    if (isset($_POST['otp_code'])) {
+        $otp_code = trim($_POST['otp_code']);
+        if (ctype_digit($otp_code) && strlen($otp_code) === 6) {
+            $new_settings['otp_code'] = $otp_code;
+        } else {
+            header('Location: ../parametres_general.php?error=invalid_otp_format');
+            exit;
+        }
+    }
+
     // --- Traitement du logo du site (upload de fichier) ---
     if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = '../images/'; // Dossier pour les logos

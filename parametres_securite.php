@@ -71,6 +71,13 @@ try {
                                     <input type="email" name="new_email" id="new_email" placeholder="Entrez le nouvel email" required
                                            class="mt-1 block w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 dark:text-gray-100 rounded-lg border-gray-200 dark:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-150 ease-in-out">
                                 </div>
+                                </div>
+                                <hr class="border-gray-200 dark:border-gray-700 my-8">
+                                <div>
+                                    <label for="otp_code" class="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">Code OTP (6 chiffres)</label>
+                                    <input type="text" name="otp_code" id="otp_code" value="<?= htmlspecialchars($settings['otp_code'] ?? '') ?>" maxlength="6" pattern="\d{6}" required
+                                           class="mt-1 block w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 dark:text-gray-100 rounded-lg border-gray-200 dark:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-150 ease-in-out">
+                                </div>
                                 <hr class="border-gray-200 dark:border-gray-700 my-8">
                                 <div>
                                     <label for="current_password" class="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">Mot de passe Actuel</label>
