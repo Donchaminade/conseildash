@@ -67,12 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Obtenir le nombre total de publicités pour la pagination
     $countQuery = "SELECT COUNT(*) FROM publicites";
     if (!empty($whereClauses)) {
-        $countQuery .= " WHERE " . implode(' AND ', array_map(function($clause) {
-            // This is a simplified way to handle placeholders in count query;
-            // A more robust solution might involve parsing the clause for named parameters.
-            // For example, replacing ':is_active' with 'is_active' and ':search' with 'title' or 'content' placeholder names
-            return str_replace([':is_active', ':start_date_min', ':end_date_max', ':search'], ['is_active', 'start_date', 'end_date', 'title'], $clause); 
-        }, $whereClauses));
+        $countQuery .= " WHERE " . implode(' AND ', $whereClauses);
     }
     $countStmt = $conn->prepare($countQuery);
     foreach ($bindParams as $param => $value) {

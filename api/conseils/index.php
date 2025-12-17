@@ -5,11 +5,11 @@ include_once __DIR__ . '/../utils.php';
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Pagination
     $page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-    $limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? max(1, (int)$_GET['limit']) : 10;
+    $limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? (int)$_GET['limit'] : 10;
     $offset = ($page - 1) * $limit;
 
     // Sorting
-    $allowedSortBy = ['id', 'title', 'author', 'location', 'status', 'created_at'];
+    $allowedSortBy = ['id', 'title', 'author', 'location', 'status', 'created_at', 'random'];
     $sortBy = isset($_GET['sort_by']) && in_array($_GET['sort_by'], $allowedSortBy) ? $_GET['sort_by'] : 'created_at';
     $order = isset($_GET['order']) && in_array(strtoupper($_GET['order']), ['ASC', 'DESC']) ? strtoupper($_GET['order']) : 'DESC';
 
@@ -17,13 +17,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $whereClauses = [];
     $bindParams = [];
 
-    if (isset($_GET['status']) && !empty($_GET['status'])) {
-        $allowedStatuses = ['pending', 'published', 'rejected'];
-        if (in_array($_GET['status'], $allowedStatuses)) {
-            $whereClauses[] = 'status = :status';
-            $bindParams[':status'] = $_GET['status'];
-        } else {
-            sendError('Invalid status filter. Allowed values are: ' . implode(', ', $allowedStatuses), 400);
+    if (isset($_GET['status'])) {
+        $statuses = explode(',', $_GET['status']); // Handle comma-separated statuses
+        $placeholders = [];
+        $i = 0;
+        foreach ($statuses as $status) {
+            $status = trim($status);
+            if (!in_array($status, ['pending', 'published', 'rejected', 'active'])) { // Added 'active' here
+                sendError('Invalid status filter. Allowed values are: pending, published, rejected, active', 400);
+            }
+            $placeholder = ':status' . $i++;
+            $placeholders[] = $placeholder;
+            $bindParams[$placeholder] = $status;
+        }
+        if (!empty($placeholders)) {
+            $whereClauses[] = 'status IN (' . implode(',', $placeholders) . ')';
         }
     }
     
@@ -34,14 +42,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
 
-    // Construire la requête (sans la colonne 'image')
+    // Build the query
     $query = "SELECT id, title, content, anecdote, author, location, status, social_link_1, social_link_2, social_link_3, created_at FROM conseils";
 
     if (!empty($whereClauses)) {
         $query .= " WHERE " . implode(' AND ', $whereClauses);
     }
 
-    $query .= " ORDER BY " . $sortBy . " " . $order . " LIMIT :limit OFFSET :offset";
+    if ($sortBy === 'random') {
+        $query .= " ORDER BY RAND()";
+    } else {
+        $query .= " ORDER BY " . $sortBy . " " . $order;
+    }
+    
+    if ($limit > 0) {
+        $query .= " LIMIT :limit OFFSET :offset";
+    }
 
     $stmt = $conn->prepare($query);
 
@@ -49,8 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     foreach ($bindParams as $param => $value) {
         $stmt->bindValue($param, $value);
     }
-    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    if ($limit > 0) {
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    }
 
     $stmt->execute();
     $conseils = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -58,9 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Obtenir le nombre total de conseils pour la pagination
     $countQuery = "SELECT COUNT(*) FROM conseils";
     if (!empty($whereClauses)) {
-        $countQuery .= " WHERE " . implode(' AND ', array_map(function($clause) {
-            return str_replace([':status', ':search'], ['status', 'title'], $clause); 
-        }, $whereClauses));
+        $countQuery .= " WHERE " . implode(' AND ', $whereClauses);
     }
     $countStmt = $conn->prepare($countQuery);
     foreach ($bindParams as $param => $value) {
@@ -107,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         sendError('Author is required and must be between 2 and 255 characters.', 400);
     }
 
-    $allowedStatuses = ['pending', 'published', 'rejected'];
+    $allowedStatuses = ['pending', 'published', 'rejected', 'active'];
     if (!in_array($data->status, $allowedStatuses)) {
         sendError('Invalid status. Allowed values are: ' . implode(', ', $allowedStatuses), 400);
     }
@@ -139,7 +155,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
     if ($stmt->execute()) {
-        sendResponse(['message' => 'Conseil created successfully.', 'id' => $conn->lastInsertId()], 201);
+        $lastId = $conn->lastInsertId();
+        
+        // Fetch the newly created conseil to return it
+        $query = "SELECT id, title, content, anecdote, author, location, status, social_link_1, social_link_2, social_link_3, created_at, updated_at FROM conseils WHERE id = :id";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':id', $lastId);
+        $stmt->execute();
+        $newConseil = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($newConseil) {
+            sendResponse($newConseil, 201);
+        } else {
+            // This case should ideally not happen if the insert was successful
+            sendResponse(['message' => 'Conseil created but could not be retrieved.', 'id' => $lastId], 207);
+        }
+
     } else {
         sendError('Failed to create conseil.', 503);
     }
